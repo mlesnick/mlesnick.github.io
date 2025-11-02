@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nails Game</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: black;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: white;
+            margin-bottom: 40px;
+        }
+                h2 {
+               margin-top: -35px; 
+            color: white;
+            margin-bottom: 10px;
+        }
+        .instructions-modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 800px;
+            position: relative;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: black;
+        }
+        .scoreboard {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 20px;
+        }
+        .stats {
+            text-align: center;
+            color: white;
+            background-color: black;
+            padding: 10px;
+            border-radius: 5px;
+            border: 2px solid rgba(255, 255, 255,.8);
+            box-shadow: 0 2px 5px rgba(255,255,255,0.1);
+            flex: 1;
+            margin: 0 10px;
+        }
+        .stats-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        #score, #timer {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 800px;
+        }
+        .card-area {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .card-container {
+            margin: 0 20px;
+            text-align: center;
+        }
+        .card {
+            width: 150px;
+            height: 150px;
+            background-color: black;
+            border: 2px solid rgba(255, 255, 255,.8);
+            border-radius: 50%;
+            position: relative;
+            display: inline-block;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: transform 1s ease;
+        }
+        
+        .highlight-group {
+            position: absolute;
+            pointer-events: none;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .highlight-bubble {
+            position: absolute;
+            background-color: rgba(128, 128, 128, 0.4);
+            border: 2px solid rgba(128, 128, 128, 0.4);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            transform: translate(-21.6px, -21.6px); /* Center on dot */
+        }
+        .next-button {
+            display: none;
+            background-color: #2196F3;
+            color: white;
+            padding: 10px 20px;
+            margin-top: 40px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .dot {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(255, 255, 255, .8);
+            position: absolute;
+            transform-origin: 75px 75px;
+        }
+        .dot.clickable {
+            cursor: pointer;
+        }
+        .dot.clickable:hover {
+            border-width: 2.5px;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        button {
+            margin: 0 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .hit-button {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .miss-button {
+            background-color: #f44336;
+            color: white;
+        }
+        .check-button {
+            background-color: #9C27B0;
+            color: white;
+        }
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 1.2em;
+            height: 25px;
+            text-align: center;
+        }
+        .start-button {
+            background-color: #2196F3;
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+        .streak-indicator {
+            display: flex;
+            margin-top: 10px;
+        }
+        .streak-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin: 0 3px;
+            background-color: #ddd;
+        }
+        .streak-dot.active {
+            background-color: #4CAF50;
+        }
+        .timer {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #ddd
+        }
+        .time-bonus {
+            color: #4CAF50;
+            position: absolute;
+            font-weight: bold;
+            animation: fadeUp 2s forwards;
+            opacity: 0;
+        }
+        @keyframes fadeUp {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-30px); }
+        }
+        .game-over-modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .game-over-content {
+           background-color: white;
+           margin: 15% auto; /* This auto margin centers it horizontally */
+          padding: 30px;
+          border-radius: 10px;
+          width: 50%; /* You can adjust this */
+          min-width: 300px; /* Add this to prevent it from getting too narrow */
+          max-width: 400px; /* Adjust this down from 600px */
+          text-align: center;
+         position: relative;
+        }
+        .play-again {
+            background-color: #2196F3;
+            color: white;
+            padding: 12px 25px;
+            font-size: 1.1em;
+            margin-top: 20px;
+        }
+        .final-score {
+            font-size: 2em;
+            margin: 15px 0;
+            color: #333;
+        }
+        /* New styling for the title art */
+        .title-art {
+            max-width: 80%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+        #start-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 30px;
+            align-items: center;
+        }
+        .small-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        .small-button.explorer {
+            background-color: #666;
+        }
+        .exit-button {
+            background-color: #666;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+            margin-top: 40px;
+        }
+        .button-pair {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .explorer-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 800px;
+            margin-top: 0px;
+        }
+        .explorer-title {
+            color: white;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Nails</h1>
+    <audio id="correctSound" preload="auto">
+        <source src="https://www.soundjay.com/buttons/sounds/button-3.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="incorrectSound" preload="auto">
+        <source src="https://www.soundjay.com/buttons/sounds/button-10.mp3" type="audio/mpeg">
+    </audio>
+      
+    <div id="start-screen">
+        <h2>pattern matching game </h2>
+        <!-- Add the title art image here -->
+        <img src="./CleanNPng.com_neeks_Hands_Colored.png" style="width: 30vw; min-width: 300px" alt="Nails Title Art" class="title-art" >
+    
+    <div class="instructions-modal" id="instructionsModal">
+        <div class="modal-content">
+            <span class="close" onclick="toggleInstructions()">&times;</span>
+            <h2>Nails Instructions</h2>
+            <p>Nails is a simple pattern matching card game in the sprit of SET, with a dynamic similar to war.  This html version of the game is for one player. <p>  
+            
+            <p>Each card has 5 dots arranged in a circle.  Each dot is red, blue, or yellow.  </p>
+            <p> Cards are presented in pairs.  A pair is a <strong>hit</strong> if there is a pattern of three dots appearing on both cards AND there is not a pattern of four dots appearing on both cards. Otherwise, the pair is a <strong>miss</strong>.  Patterns must have the same clockwise/counterclockwise orientation to count.  The game is to decide whether each pair is a hit or a miss.   </p>  
+            <p>Examples:<img src="https://www.albany.edu/~ml644186/nails_examples.png" alt="Examples of hits and misses" style="width:100%; max-width:800px; margin: 20px 0;"></p>           
+           
+            <h3>Game play:</h3>
+            <ol>
+                <li>You have 100 seconds to score as many points as possible</li>
+                <li>Each correct answer: +1 point</li>
+                <li>Each incorrect answer: -2 points</li>
+                <li>Get 5 correct answers in a row for a +15 second time bonus</li>
+                <li>Press the hit, miss, and next buttons using either mouse or keyboard (H, M, and N, respectively)</li>
+            </ol>
+            
+            <h3> Notes </h3>
+            <p> Each pair of cards is drawn uniformly at random.  The two cards shown are never the same, and cards with all dots the same color are excluded.  The probably that a randomly chosen pair is a hit is approximately 50.5%.</p>
+           
+            <h3>About</h3>
+            <p>The card game Nails was designed in 2010 by Michael Lesnick and developed by Michael and Thomas Lesnick.  This html version was created in 2025 by Michael Lesnick and Aaron Soloway, with major assistance from Claude.</p>
+            
+             <h3>Contact</h3>
+            <p>Feedback about the game is welcome, and can be sent to <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="fe929b8d90979d95be99939f9792d09d9193">[email&#160;protected]</a>.</p>
+        </div>
+    </div>
+        
+        
+                <button class="small-button" onclick="toggleInstructions()">Instructions</button>
+                <button id="start-button" class="start-button" onclick="startGame()">Start Game</button>
+                <button class="small-button explorer" onclick="startExplorer()" style="margin-top: 20px;">Pair Checker</button>
+    </div>
+    
+    <div id="game-container" style="display: none;">
+        <div class="scoreboard">
+            <div class="stats">
+                <div class="stats-label">Score</div>
+                <div id="score">0</div>
+            </div>
+            <div class="stats">
+                <div class="stats-label">Timer</div>
+                <div id="timer" class="timer">100</div>
+            </div>
+            <div class="stats">
+                <div class="stats-label">Streak</div>
+                <div class="streak-indicator" id="streak-indicator">
+                    <div class="streak-dot" id="streak-1"></div>
+                    <div class="streak-dot" id="streak-2"></div>
+                    <div class="streak-dot" id="streak-3"></div>
+                    <div class="streak-dot" id="streak-4"></div>
+                    <div class="streak-dot" id="streak-5"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="game-area">
+            <div class="card-area">
+                <div class="card-container">
+                    <div id="card1" class="card"></div>
+                </div>
+                <div class="card-container">
+                    <div id="card2" class="card"></div>
+                </div>
+            </div>
+            
+            <div id="controls" class="controls">
+                <button class="hit-button" onclick="makeCall('hit')">HIT</button>
+                <button class="miss-button" onclick="makeCall('miss')">MISS</button>
+            </div>
+            
+            <div id="result" class="result"></div>
+            <button id="next-button" class="next-button" onclick="nextPair()">Next</button>
+        </div>
+    </div>
+    
+    <div id="explorer-container" style="display: none;">
+        <div class="explorer-area">
+            <div class="explorer-title">click on dots to change color</div>
+            <div class="card-area">
+                <div class="card-container">
+                    <div id="explorer-card1" class="card"></div>
+                </div>
+                <div class="card-container">
+                    <div id="explorer-card2" class="card"></div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button class="check-button" onclick="checkExplorerPair()">Check Pair</button>
+            </div>
+            
+            <div id="explorer-result" class="result"></div>
+            <div class="button-pair">
+                <button id="explorer-next-button" class="next-button" onclick="nextExplorerPair()">Continue</button>
+                <button id="explorer-exit-button" class="exit-button" onclick="exitExplorer()">Exit</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="game-over-modal" id="gameOverModal">
+        <div class="game-over-content">
+            <h2>Game Over!</h2>
+            <p>Your final score:</p>
+            <div id="final-score" class="final-score">0</div>
+            <button class="play-again" onclick="resetGame()">Play Again</button>
+        </div>
+    </div>
+    
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+        // Game variables
+        const colors = ['red', 'blue', 'yellow'];
+        let deck = [];
+        let score = 0;
+        let streak = 0;
+        let timeRemaining = 100;
+        let timer = null;
+        let currentCards = [];
+        let gameActive = false;
+        let audioContext = null;
+        let explorerCards = [
+            ['red', 'red', 'red', 'red', 'red'],
+            ['red', 'red', 'red', 'red', 'red']
+        ];
+        
+        document.addEventListener('keydown', function(event) {
+    // Only handle keypresses if game is active
+    if (!gameActive) return;
+    
+    switch(event.key.toLowerCase()) {
+        case 'h':
+            // Simulate hit button click if button is enabled
+            if (!document.querySelector('.hit-button').disabled) {
+                makeCall('hit');
+            }
+            break;
+        case 'm':
+            // Simulate miss button click if button is enabled
+            if (!document.querySelector('.miss-button').disabled) {
+                makeCall('miss');
+            }
+            break;
+        case 'n':
+            // Simulate next button click if it's visible
+            if (document.getElementById('next-button').style.display === 'inline-block') {
+                nextPair();
+            }
+            break;
+    }
+});
+
+        function playBonusSound() {
+            // Initialize AudioContext on first play
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            
+            const ctx = audioContext;
+            
+            // Main tone
+            const mainOsc = ctx.createOscillator();
+            mainOsc.type = 'sine';
+            mainOsc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+            
+            // Harmony
+            const harmonyOsc = ctx.createOscillator();
+            harmonyOsc.type = 'sine';
+            harmonyOsc.frequency.setValueAtTime(880, ctx.currentTime); // A5
+
+            // Natural decay envelope
+            const mainGain = ctx.createGain();
+            mainGain.gain.setValueAtTime(0, ctx.currentTime);
+            mainGain.gain.linearRampToValueAtTime(0.4, ctx.currentTime + 0.02);
+            mainGain.gain.exponentialRampToValueAtTime(0.004, ctx.currentTime + 0.24);
+            mainGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.25);
+            
+            const harmonyGain = ctx.createGain();
+            harmonyGain.gain.setValueAtTime(0, ctx.currentTime);
+            harmonyGain.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.02);
+            harmonyGain.gain.exponentialRampToValueAtTime(0.002, ctx.currentTime + 0.19);
+            harmonyGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.2);
+            
+            // Add brightness
+            const filter = ctx.createBiquadFilter();
+            filter.type = 'highshelf';
+            filter.frequency.setValueAtTime(1000, ctx.currentTime);
+            filter.gain.setValueAtTime(6, ctx.currentTime);
+            
+            // Connect everything
+            mainOsc.connect(mainGain);
+            harmonyOsc.connect(harmonyGain);
+            mainGain.connect(filter);
+            harmonyGain.connect(filter);
+            filter.connect(ctx.destination);
+            
+        // Play sound
+            mainOsc.start(ctx.currentTime);
+            harmonyOsc.start(ctx.currentTime);
+            
+            mainOsc.stop(ctx.currentTime + 0.4);
+            harmonyOsc.stop(ctx.currentTime + 0.4);
+        }
+        
+	   function playGameOverSound() {
+            console.log("Function called!"); // Debug log
+            
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            
+            const ctx = audioContext;
+            console.log("Audio context created:", ctx); // Debug log
+            
+            // Create oscillators for three descending notes
+            const notes = [
+                { freq: 220, start: 0 },    // A4
+                { freq: 196, start: 0.25 }, // G4
+                { freq: 174.615, start: 0.5 } // F4
+            ];
+            
+            notes.forEach(note => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(note.freq, ctx.currentTime + note.start);
+                
+                gain.gain.setValueAtTime(0, ctx.currentTime + note.start);
+                gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + note.start + 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + note.start + 0.4);
+                
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                osc.start(ctx.currentTime + note.start);
+                osc.stop(ctx.currentTime + note.start + 0.5);
+            });
+        }
+
+        // Helper function to check if two patterns are the same up to rotation
+        function arePatternsEquivalent(pattern1, pattern2) {
+            for (let rotation = 0; rotation < 5; rotation++) {
+                if (pattern1.every((color, i) => color === pattern2[(i + rotation) % 5])) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Generate all possible combinations of 5 dots with 3 colors
+        function generateDeck() {
+            deck = [];
+            
+            for (let i = 0; i < 3**5; i++) {
+                let pattern = [];
+                let temp = i;
+                for (let j = 0; j < 5; j++) {
+                    pattern.push(colors[temp % 3]);
+                    temp = Math.floor(temp / 3);
+                }
+                
+                // Skip cards where all dots are the same color
+                if (pattern.every(color => color === pattern[0])) continue;
+                
+                // Only add if this pattern is not equivalent to one we already have
+                if (!deck.some(existingPattern => arePatternsEquivalent(pattern, existingPattern))) {
+                    deck.push(pattern);
+                }
+            }
+        }
+        
+        function toggleInstructions() {
+            const modal = document.getElementById('instructionsModal');
+            if (modal.style.display === 'block') {
+                modal.style.display = 'none';
+            } else {
+                modal.style.display = 'block';
+            }
+        }
+        
+        function startGame() {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('game-container').style.display = 'block';
+            
+            generateDeck();
+            score = 0;
+            streak = 0;
+            timeRemaining = 100;
+            gameActive = true;
+            
+            updateScore();
+            updateStreak();
+            
+            // Start timer
+            timer = setInterval(() => {
+                timeRemaining--;
+                document.getElementById('timer').textContent = timeRemaining;
+                
+                if (timeRemaining <= 0) {
+                    endGame();
+                }
+            }, 1000);
+            
+            // Draw first pair of cards
+            drawCards();
+        }
+        
+        function startExplorer() {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('explorer-container').style.display = 'block';
+            
+            // Initialize explorer cards (all red)
+            explorerCards = [
+                ['red', 'red', 'red', 'red', 'red'],
+                ['red', 'red', 'red', 'red', 'red']
+            ];
+            
+            // Display explorer cards
+            displayExplorerCard('explorer-card1', explorerCards[0], 0);
+            displayExplorerCard('explorer-card2', explorerCards[1], 1);
+        }
+        
+        function drawCards() {
+            // Choose 2 random cards from the deck
+            const index1 = Math.floor(Math.random() * deck.length);
+            let index2 = Math.floor(Math.random() * deck.length);
+            // Ensure we don't get the same card twice
+            while (index2 === index1) {
+                index2 = Math.floor(Math.random() * deck.length);
+            }
+            
+            currentCards = [deck[index1], deck[index2]];
+            // Apply random rotation to the patterns
+            const rotation = Math.floor(Math.random() * 5);
+            currentCards[0] = [...currentCards[0].slice(rotation), ...currentCards[0].slice(0, rotation)];
+            const rotation2 = Math.floor(Math.random() * 5);
+            currentCards[1] = [...currentCards[1].slice(rotation2), ...currentCards[1].slice(0, rotation2)];
+            
+            // Display cards
+            displayCard('card1', currentCards[0]);
+            displayCard('card2', currentCards[1]);
+            
+            // Clear previous result
+            document.getElementById('result').textContent = '';
+
+            // Ensure Hit/Miss buttons are enabled
+            document.querySelector('.hit-button').disabled = false;
+            document.querySelector('.miss-button').disabled = false;
+        }
+        
+        function displayCard(elementId, pattern) {
+            const cardElement = document.getElementById(elementId);
+            cardElement.innerHTML = '';
+            
+            // Calculate positions for 5 dots in a ring
+            for (let i = 0; i < 5; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                dot.style.backgroundColor = pattern[i];
+                
+                // Position the dot around the circle
+                const angle = (i * 72) - 90; // Start from the top (-90 degrees) and go clockwise
+                const radian = angle * Math.PI / 180;
+                const x = 75 + 50 * Math.cos(radian);
+                const y = 75 + 50 * Math.sin(radian);
+                
+                dot.style.left = `${x - 13.5}px`; // Adjust for dot size
+                dot.style.top = `${y - 13.5}px`; // Adjust for dot size
+                
+                cardElement.appendChild(dot);
+            }
+        }
+        
+        function displayExplorerCard(elementId, pattern, cardIndex) {
+            const cardElement = document.getElementById(elementId);
+            cardElement.innerHTML = '';
+            
+            // Calculate positions for 5 dots in a ring
+            for (let i = 0; i < 5; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot clickable';
+                dot.style.backgroundColor = pattern[i];
+                
+                // Position the dot around the circle
+                const angle = (i * 72) - 90; // Start from the top (-90 degrees) and go clockwise
+                const radian = angle * Math.PI / 180;
+                const x = 75 + 50 * Math.cos(radian);
+                const y = 75 + 50 * Math.sin(radian);
+                
+                dot.style.left = `${x - 13.5}px`; // Adjust for dot size
+                dot.style.top = `${y - 13.5}px`; // Adjust for dot size
+                
+                // Add click handler
+                dot.addEventListener('click', function() {
+                    cycleColor(cardIndex, i);
+                });
+                
+                cardElement.appendChild(dot);
+            }
+        }
+        
+        function cycleColor(cardIndex, dotIndex) {
+            const currentColor = explorerCards[cardIndex][dotIndex];
+            let newColor;
+            
+            // Cycle through colors: red -> yellow -> blue -> red
+            if (currentColor === 'red') {
+                newColor = 'yellow';
+            } else if (currentColor === 'yellow') {
+                newColor = 'blue';
+            } else {
+                newColor = 'red';
+            }
+            
+            explorerCards[cardIndex][dotIndex] = newColor;
+            
+            // Update display
+            displayExplorerCard(cardIndex === 0 ? 'explorer-card1' : 'explorer-card2', explorerCards[cardIndex], cardIndex);
+        }
+        
+        function checkExplorerPair() {
+            // Disable Check Pair button
+            document.querySelector('.check-button').disabled = true;
+            
+            const analysis = analyzeCards(explorerCards[0], explorerCards[1]);
+            const correctAnswer = analysis.isHit ? 'hit' : 'miss';
+            
+            // Show explanation
+            const sharedPatternSize = analysis.matches.length;
+            document.getElementById('explorer-result').innerHTML = 
+                `These cards ${correctAnswer === 'hit' ? 'HIT' : 'MISS'}.<br>` +
+                `Max size of shared pattern: ${sharedPatternSize}`;
+            document.getElementById('explorer-result').style.color = correctAnswer === 'hit' ? "#4CAF50" : "#f44336";
+            
+            // Rotate card2 to optimal alignment
+            const card2 = document.getElementById('explorer-card2');
+            const rotationDegrees = analysis.optimalRotation * -72;
+            card2.style.transform = `rotate(${rotationDegrees}deg)`;
+            
+            // Add highlight bubbles after rotation animation
+            setTimeout(() => {
+                // Create highlight groups for both cards
+                const highlightGroup1 = document.createElement('div');
+                highlightGroup1.className = 'highlight-group';
+                const highlightGroup2 = document.createElement('div');
+                highlightGroup2.className = 'highlight-group';
+                
+                // Add bubbles for matched dots
+                analysis.matches.forEach(match => {
+                    // Calculate positions for card1
+                    const angle1 = (match.index1 * 72) - 90;
+                    const radian1 = angle1 * Math.PI / 180;
+                    const x1 = 75 + 50 * Math.cos(radian1);
+                    const y1 = 75 + 50 * Math.sin(radian1);
+                    
+                    // Calculate positions for card2
+                    const angle2 = (match.index2 * 72) - 90;
+                    const radian2 = angle2 * Math.PI / 180;
+                    const x2 = 75 + 50 * Math.cos(radian2);
+                    const y2 = 75 + 50 * Math.sin(radian2);
+                    
+                    // Create and position bubbles
+                    const bubble1 = document.createElement('div');
+                    bubble1.className = 'highlight-bubble';
+                    bubble1.style.left = `${x1}px`;
+                    bubble1.style.top = `${y1}px`;
+                    
+                    const bubble2 = document.createElement('div');
+                    bubble2.className = 'highlight-bubble';
+                    bubble2.style.left = `${x2}px`;
+                    bubble2.style.top = `${y2}px`;
+                    
+                    highlightGroup1.appendChild(bubble1);
+                    highlightGroup2.appendChild(bubble2);
+                });
+                
+                // Add highlight groups to cards
+                document.getElementById('explorer-card1').appendChild(highlightGroup1);
+                document.getElementById('explorer-card2').appendChild(highlightGroup2);
+                
+                // Show the Next and Exit buttons
+                document.getElementById('explorer-next-button').style.display = 'inline-block';
+                document.getElementById('explorer-exit-button').style.display = 'inline-block';
+            }, 1000);
+        }
+        
+        function nextExplorerPair() {
+            // Remove highlight groups if they exist
+            const groups = document.querySelectorAll('.highlight-group');
+            groups.forEach(group => group.remove());
+            
+            // Unrotate card2
+            const card2 = document.getElementById('explorer-card2');
+            card2.style.transform = 'rotate(0deg)';
+            
+            // Clear result
+            document.getElementById('explorer-result').textContent = '';
+            
+            // Hide the Next and Exit buttons
+            document.getElementById('explorer-next-button').style.display = 'none';
+            document.getElementById('explorer-exit-button').style.display = 'none';
+            
+            // Re-enable Check Pair button
+            document.querySelector('.check-button').disabled = false;
+        }
+        
+        function exitExplorer() {
+            document.getElementById('explorer-container').style.display = 'none';
+            document.getElementById('start-screen').style.display = 'flex';
+            
+            // Clear result and hide both buttons
+            document.getElementById('explorer-result').textContent = '';
+            document.getElementById('explorer-next-button').style.display = 'none';
+            document.getElementById('explorer-exit-button').style.display = 'none';
+        }
+        
+        function makeCall(call) {
+            if (!gameActive) return;
+            
+            const analysis = analyzeCards(currentCards[0], currentCards[1]);
+            const correctAnswer = analysis.isHit ? 'hit' : 'miss';
+            const isCorrect = call === correctAnswer;
+            
+            if (isCorrect) {
+                // Disable Hit/Miss buttons
+                document.querySelector('.hit-button').disabled = true;
+                document.querySelector('.miss-button').disabled = true;
+                score += 1;
+                streak += 1;
+                document.getElementById('result').textContent = "Correct!";
+                document.getElementById('result').style.color = "#4CAF50";
+                
+                // Check for streak bonus
+                if (streak === 5) {
+                    // Award time bonus
+                    timeRemaining += 15;
+                    document.getElementById('timer').textContent = timeRemaining;
+                    
+                    // Play bonus sound instead of regular correct sound
+                    playBonusSound();
+                    
+                    // Show time bonus animation
+                    const timerElement = document.getElementById('timer');
+                    const bonusElement = document.createElement('div');
+                    bonusElement.className = 'time-bonus';
+                    bonusElement.textContent = '+15s';
+                    bonusElement.style.left = `${timerElement.offsetLeft + timerElement.offsetWidth/2}px`;
+                    bonusElement.style.top = `${timerElement.offsetTop}px`;
+                    document.body.appendChild(bonusElement);
+                    
+                    // Remove the animation element after it completes
+                    setTimeout(() => {
+                        document.body.removeChild(bonusElement);
+                    }, 2000);
+                    
+                    // Reset streak after bonus
+                    streak = 0;
+                } else {
+                    // Play regular correct sound for non-bonus correct answers
+                    const correctSound = document.getElementById('correctSound');
+                    correctSound.volume = 0.08;
+                    correctSound.play();
+                }
+                
+                // Draw new cards after a short delay
+                setTimeout(drawCards, 1000);
+            } else {
+                // Disable Hit/Miss buttons
+                document.querySelector('.hit-button').disabled = true;
+                document.querySelector('.miss-button').disabled = true;
+                score = Math.max(0, score - 2); // Don't go below 0
+                streak = 0;
+                const incorrectSound = document.getElementById('incorrectSound');
+                incorrectSound.volume = 0.08;
+                incorrectSound.play();
+                
+                // Show explanation
+                const sharedPatternSize = analysis.matches.length;
+                document.getElementById('result').innerHTML = 
+                    `Incorrect! These cards ${correctAnswer === 'hit' ? 'do' : 'do not'} hit.<br>` +
+                    `Max size of shared pattern: ${sharedPatternSize}`;
+                document.getElementById('result').style.color = "#f44336";
+                
+                // Rotate card2 to optimal alignment with shortest path
+                const card2 = document.getElementById('card2');
+                const rotationDegrees = analysis.optimalRotation * -72;
+                card2.style.transform = `rotate(${rotationDegrees}deg)`;
+                
+                // Add highlight bubbles after rotation animation
+                setTimeout(() => {
+                    // Create highlight groups for both cards
+                    const highlightGroup1 = document.createElement('div');
+                    highlightGroup1.className = 'highlight-group';
+                    const highlightGroup2 = document.createElement('div');
+                    highlightGroup2.className = 'highlight-group';
+                    
+                    // Add bubbles for matched dots
+                    analysis.matches.forEach(mismatch => {
+                        // Calculate positions for card1
+                        const angle1 = (mismatch.index1 * 72) - 90;
+                        const radian1 = angle1 * Math.PI / 180;
+                        const x1 = 75 + 50 * Math.cos(radian1);
+                        const y1 = 75 + 50 * Math.sin(radian1);
+                        
+                        // Calculate positions for card2
+                        const angle2 = (mismatch.index2 * 72) - 90;
+                        const radian2 = angle2 * Math.PI / 180;
+                        const x2 = 75 + 50 * Math.cos(radian2);
+                        const y2 = 75 + 50 * Math.sin(radian2);
+                        
+                        // Create and position bubbles
+                        const bubble1 = document.createElement('div');
+                        bubble1.className = 'highlight-bubble';
+                        bubble1.style.left = `${x1}px`;
+                        bubble1.style.top = `${y1}px`;
+                        
+                        const bubble2 = document.createElement('div');
+                        bubble2.className = 'highlight-bubble';
+                        bubble2.style.left = `${x2}px`;
+                        bubble2.style.top = `${y2}px`;
+                        
+                        highlightGroup1.appendChild(bubble1);
+                        highlightGroup2.appendChild(bubble2);
+                    });
+                    
+                    // Add highlight groups to cards
+                    document.getElementById('card1').appendChild(highlightGroup1);
+                    document.getElementById('card2').appendChild(highlightGroup2);
+                    
+                    // Show the Next button
+                    document.getElementById('next-button').style.display = 'inline-block';
+                }, 1000);
+            }
+            
+            updateScore();
+            updateStreak();
+        }
+        
+        function nextPair() {
+            // Remove highlight groups if they exist
+            const groups = document.querySelectorAll('.highlight-group');
+            groups.forEach(group => group.remove());
+            
+            // Hide the Next button
+            document.getElementById('next-button').style.display = 'none';
+            
+            // Draw new cards
+            drawCards();
+        }
+        
+        function analyzeCards(card1, card2) {
+            let maxMatchingDots = 0;
+            let bestRotation = 0;
+            let bestMatches = [];
+            
+            // Try each rotation of card2, keeping track of which gives max matches
+            for (let rotation = 0; rotation < 5; rotation++) {
+                let matchCount = 0;
+                let currentMatches = [];
+                
+                for (let i = 0; i < 5; i++) {
+                    if (card1[i] === card2[(i + rotation) % 5]) {
+                        matchCount++;
+                        currentMatches.push({
+                            index1: i,
+                            index2: (i + rotation) % 5
+                        });
+                    } 
+                }
+                
+                // If we found more matches, or same matches with smaller rotation
+                if (matchCount > maxMatchingDots || 
+                    (matchCount === maxMatchingDots && 
+                     Math.min(rotation, 5 - rotation) < Math.min(bestRotation, 5 - bestRotation))) {
+                    maxMatchingDots = matchCount;
+                    bestRotation = rotation;
+                    bestMatches = currentMatches;
+                }
+            }
+            
+            // Convert to smallest rotation (-2 to +2)
+            if (bestRotation > 2) {
+                bestRotation = bestRotation - 5;
+            }
+            
+            return {
+                isHit: maxMatchingDots === 3,
+                matchingDots: maxMatchingDots,
+                optimalRotation: bestRotation,
+                matches: bestMatches
+            };
+        }
+        
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+        }
+        
+        function updateStreak() {
+            // Update streak dots
+            for (let i = 1; i <= 5; i++) {
+                const dot = document.getElementById(`streak-${i}`);
+                if (i <= streak) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            }
+        }
+        
+        function endGame() {
+            clearInterval(timer);
+            gameActive = false;
+           // Show game over modal
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('gameOverModal').style.display = 'block';
+           playGameOverSound();
+	    }
+        
+        function resetGame() {
+            document.getElementById('gameOverModal').style.display = 'none';
+            startGame();
+        }
+        
+        // Initialize the game
+        generateDeck();
+    </script>
+</body>
+</html>1988154

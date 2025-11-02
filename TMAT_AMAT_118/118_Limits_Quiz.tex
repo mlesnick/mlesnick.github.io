@@ -1,0 +1,195 @@
+\documentstyle[10pt]{amsart}
+\pagestyle{empty}
+\newcommand{\R}{\Bbb{R}}
+\newcommand{\ans}[1]{\ \ \textbf{Answer}: \ #1}
+\newtheorem{thm}{Theorem}
+
+\begin{document}
+\begin{flushleft}
+{\sc \Large TMAT/AMAT 118} \hfill {\Large Limits Quiz} \\
+\medskip
+Name: \underline{\hspace{2.0in}} \\
+\end{flushleft}
+
+\begin{samepage}
+\begin{flushleft}
+1 [2 points].  For $f:S\to T$ a function and $U\subset S$, give the definition of $f(U)$ (that is, give the definition of the image of $U$ under $f$).  
+\ans \[f(U)=\{t\in T \mid t=f(s)\textup{ for some $s\in U$}.\}\]
+\end{flushleft}
+\vspace{.25in}
+\end{samepage}
+
+\begin{samepage}
+\begin{flushleft}
+2 [3 points]. Let $S=\{A,B,C\}$, and let $f:S\to S$ be given by $f(A)=B$, $f(B)=C$, and $f(C)=A$.  For each of the following choices of $U$, what is $f(U)$?
+\begin{itemize}
+%\item[(a)] $y=-f(x)$,
+%\item[(b)] $y=f(-x)$,
+\item[(a)] $U=S$, \ans $S$.\footnote{There was a typo in this question.  It originally said $U=\{S\}$ instead of $U=S$.  (For $U=\{S\}$, $f(U)$ is not defined, which wasn't what I intended.)  Given the typo, I awarded everyone full credit for this subproblem.}
+\item[(b)] $U=\{A,B\}$,  \ans $\{B,C\}$.
+\item[(c)] $U=\{B\}$, \ans $\{C\}$.
+\end{itemize}
+\end{flushleft}
+\vspace{.1in}
+\end{samepage}
+
+\begin{samepage}
+\begin{flushleft}
+3 [4 points]. Let $f:\R\to \R$ be given by $f(x)=x+1$.  For each of the following choices of $U$, what is $f(U)$?
+\begin{itemize}
+%\item[(a)] $y=-f(x)$,
+%\item[(b)] $y=f(-x)$,
+\item[(a)] $U=\{0\}$, \ans $\{1\}$
+\item[(b)] $U$ is the interval $(0,1)$, \ans $(1,2)$
+\item[(c)] $U$ is the interval $(0,\infty)$, \ans $(1,\infty)$
+\item[(d)] $U=\R$ \ans $\R$.
+\end{itemize}
+\end{flushleft}
+\vspace{.1in}
+\end{samepage}
+
+\begin{samepage}
+\begin{flushleft}
+4  [1 point]. True or False: For every even integer $z$, there exists an odd integer $y$ such that $y=2z$.  HINT: To get an idea of the answer, it may help to look at a few examples of even integers.  \ans False.  For example take $z=2$.  $2z=4$ is even, so there is no such $y$.
+\end{flushleft}
+\vspace{.1in}
+\end{samepage}
+
+\begin{samepage}
+\begin{flushleft}
+5 [1 point]. Define a punctured ball centered at $p\in \R$, as I defined it in the notes and in class.  \ans A punctured ball centered at $p$ is a set of the form \[(p-\epsilon,p)\cup (p,p+\epsilon)\] for some $\epsilon>0$.
+\end{flushleft}
+\vspace{.1in}
+\end{samepage}
+
+\begin{samepage}
+\begin{flushleft}
+6 [1 point]. Is the singleton set $\{0\}\subset \R$ a punctured ball centered at 0?  \ans No.
+\end{flushleft}
+\vspace{.1in}
+\end{samepage}
+
+%\begin{samepage}
+%\begin{flushleft}
+%7 [1 point]. Is $[1,1]$ a punctured ball centered around any point?
+%\end{flushleft}
+%\vspace{.1in}
+%\end{samepage}
+
+\begin{samepage}
+\begin{flushleft}
+7 [3 points].  Complete the following to give the intuitive definition of a limit:
+\\ \ \\ 
+Let $f$ be a function defined near $p\in \R$, but not necessarily at $p$.  We write \[\lim_{x\to p} f(x)=L\] if $\_\_\_.$
+
+\end{flushleft}
+\vspace{.25in}
+\end{samepage}
+\pagebreak
+\begin{samepage}
+\begin{flushleft}
+8. [3 points] Fill in the three blanks in the following precise definition of a limit.  (Write the answers below the question).  %Note: You can give either the definition I presented in my notes and in class, or the $\epsilon$-$\delta$ presented in the text and also in the notes. 
+\ans See the beginning of Section 2.2 in the textbook.
+\\ \ \\ 
+Suppose we are given:
+\begin{itemize}
+\item  $S\subset \R$, 
+\item $p,L\in \R$ such that $S$ contains a punctured ball centered at $p$, 
+\item a function $f:S\to \R$.
+\end{itemize}
+We write \[\lim_{x\to p} f(x)=L\] if for every $\_\_\_(a)\_\_\_$, there exists $\_\_\_(b)\_\_\_$ such that $\_\_\_(c)\_\_\_$.\\
+\ans There are two correct answers: \\
+Answer 1: \\(a) ball $C$ centered at $L$ \\(b) a punctured ball $B$ centered at $p$\\ (c) $f(B)\subset C$. \\ \ \\
+Answer 2: \\(a) $\epsilon>0$ \\(b) $\delta>0$ \\(c) if $0<|x-p|<\delta$, then $|f(x)-L|<\epsilon.$
+\end{flushleft}
+\vspace{.25in}
+\end{samepage}
+
+
+\end{document}
+
+\begin{samepage}
+\begin{flushleft}
+2. For which $x$ is the function $f(x)=-2x(4-x)^{-1/2}$ not defined? \\\ans{The answer depends on whether we allow our functions to take complex values.  If not, the answer is $x\in [4,\infty)$.  If so, the answer $x=4$.  I accepted both answers.  However, in the future, we will usually restrict attention to real-values in this class.}
+\end{flushleft}
+\vspace{.25in}
+\end{samepage}
+
+
+\begin{samepage}
+\begin{flushleft}
+3. If $f(x)=x^2$, what is the function $f\circ f$?
+\ans{$f\circ f(x)=x^4$}
+\end{flushleft}
+\vspace{.25in}
+\end{samepage}
+
+\begin{samepage}
+\begin{flushleft}
+4. If $f(x)=x^2-1$, what is the function $f\circ f$?
+\ans{$f\circ f(x)=x^4-2x$}
+\end{flushleft}
+\vspace{.25in}
+\end{samepage}
+
+\begin{samepage}
+\begin{flushleft}
+5. For $f(x)=\sin x$, find all $y$ such that there exists some $x$ with $y= f(x)$. (That is, find the range of $f$).  Express the answer as an interval.  \ans{[-1,1]}
+\end{flushleft}
+\vspace{.25in}
+\end{samepage}
+
+\begin{samepage}
+\begin{flushleft}
+6. Express 60 degrees in radians.  \ans{$\pi/3$}
+\vspace{.25in}
+\end{flushleft}
+\end{samepage}
+
+\begin{samepage}
+\begin{flushleft}
+7. Express $\pi/3$ radians in degrees.  \ans{60}
+\vspace{.25in}
+\end{flushleft}
+\end{samepage}
+
+\begin{samepage}
+\begin{flushleft}
+8. What is $\cos \pi/3$? \ans{1/2}.  Use ``SOH CAH TOA" and consider the 30-60-90 triangle with hypotenuse of length 1.
+\vspace{.25in}
+\end{flushleft}
+\end{samepage}
+
+\begin{samepage}
+\begin{flushleft}
+9. What is $\sin \pi/3$? \ans{$\frac{\sqrt{3}}{2}$}.
+\vspace{.25in}
+\end{flushleft}
+\end{samepage}
+
+\end{document}
+
+\pagebreak
+\begin{flushleft}
+4. (2 points) Write down all of the \emph{binary} $2\times 2$ matrices in row echelon form; we say a matrix is binary if each of its entries is either 1 or 0.  %\\ (Hint: According to the definition, 
+%$
+%\left(
+%\begin{array}{rr}
+%0  &0                \\
+%0  &0                    \\        
+%\end{array}
+%\right)
+%$
+%is in row echelon form.)
+\end{flushleft}
+\vspace{2in}
+\begin{flushleft}
+5. (2 points) Using the definition of row echelon form (as given in class or on page 44 of Meyer), show that a matrix in row echelon form has at most one pivot in each column.  
+\\ \ \\
+(Reminder: For a matrix $E$ in row echelon form, we say $E_{ij}$ is a \emph{pivot} if $E_{ij}$ is the first non-zero entry in its row; that is, $E_{ij}$ is a pivot if
+\begin{enumerate}
+\item $E_{ij}\ne 0$,\\
+\item $E_{ij'}=0$ for $j'<j$.)  
+\end{enumerate}
+\end{flushleft}
+\end{document}

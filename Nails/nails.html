@@ -18,30 +18,10 @@
             color: white;
             margin-bottom: 40px;
         }
-                h2 {
-               margin-top: -35px; 
+             h2.custom {
+            margin-top: -35px; 
             color: white;
             margin-bottom: 10px;
-        }
-        .instructions-modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
-        }
-        .modal-content {
-            background-color: white;
-            margin: 10% auto;
-            padding: 20px;
-            border-radius: 5px;
-            width: 80%;
-            max-width: 800px;
-            position: relative;
         }
         .close {
             color: #aaa;
@@ -322,49 +302,20 @@
 <body>
     <h1>Nails</h1>
     <audio id="correctSound" preload="auto">
-        <source src="https://www.soundjay.com/buttons/sounds/button-3.mp3" type="audio/mpeg">
+        <source src="./bell-sound-370341.mp3" type="audio/mpeg">
     </audio>
     <audio id="incorrectSound" preload="auto">
-        <source src="https://www.soundjay.com/buttons/sounds/button-10.mp3" type="audio/mpeg">
+        <source src="./classic-game-action-negative-19-224578.mp3" type="audio/mpeg">
     </audio>
       
     <div id="start-screen">
-        <h2>pattern matching game </h2>
+        <h2 class="custom">pattern matching game </h2>
         <!-- Add the title art image here -->
         <img src="./CleanNPng.com_neeks_Hands_Colored.png" style="width: 30vw; min-width: 300px" alt="Nails Title Art" class="title-art" >
     
-    <div class="instructions-modal" id="instructionsModal">
-        <div class="modal-content">
-            <span class="close" onclick="toggleInstructions()">&times;</span>
-            <h2>Nails Instructions</h2>
-            <p>Nails is a simple pattern matching card game in the sprit of SET, with a dynamic similar to war.  This html version of the game is for one player. <p>  
-            
-            <p>Each card has 5 dots arranged in a circle.  Each dot is red, blue, or yellow.  </p>
-            <p> Cards are presented in pairs.  A pair is a <strong>hit</strong> if there is a pattern of three dots appearing on both cards AND there is not a pattern of four dots appearing on both cards. Otherwise, the pair is a <strong>miss</strong>.  Patterns must have the same clockwise/counterclockwise orientation to count.  The game is to decide whether each pair is a hit or a miss.   </p>  
-            <p>Examples:<img src="https://mlesnick.github.io/nails_examples.png" alt="Examples of hits and misses" style="width:100%; max-width:800px; margin: 20px 0;"></p>           
            
-            <h3>Game play:</h3>
-            <ol>
-                <li>You have 100 seconds to score as many points as possible</li>
-                <li>Each correct answer: +1 point</li>
-                <li>Each incorrect answer: -2 points</li>
-                <li>Get 5 correct answers in a row for a +15 second time bonus</li>
-                <li>Press the hit, miss, and next buttons using either mouse or keyboard (H, M, and N, respectively)</li>
-            </ol>
-            
-            <h3> Notes </h3>
-            <p> Each pair of cards is drawn uniformly at random.  The two cards shown are never the same, and cards with all dots the same color are excluded.  The probably that a randomly chosen pair is a hit is approximately 50.5%.</p>
-           
-            <h3>About</h3>
-            <p>The card game Nails was designed in 2010 by Michael Lesnick and developed by Michael and Thomas Lesnick.  This html version was created in 2025 by Michael Lesnick and Aaron Soloway, with major assistance from Claude.</p>
-            
-             <h3>Contact</h3>
-            <p>Feedback about the game is welcome, and can be sent to <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="fe929b8d90979d95be99939f9792d09d9193">[email&#160;protected]</a>.</p>
-        </div>
-    </div>
-        
-        
-                <button class="small-button" onclick="toggleInstructions()">Instructions</button>
+       
+                <button class="small-button" onclick="window.location.href='instructions.html'">Instructions</button>
                 <button id="start-button" class="start-button" onclick="startGame()">Start Game</button>
                 <button class="small-button explorer" onclick="startExplorer()" style="margin-top: 20px;">Pair Checker</button>
     </div>
@@ -444,7 +395,7 @@
         </div>
     </div>
     
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+   <script>
         // Game variables
         const colors = ['red', 'blue', 'yellow'];
         let deck = [];
@@ -573,6 +524,41 @@
                 osc.stop(ctx.currentTime + note.start + 0.5);
             });
         }
+        
+function fadeOut(audio, duration) {
+    if (!audio) return;
+
+    // Cancel any existing fade on this audio element
+    if (audio._fadeInterval) {
+        clearInterval(audio._fadeInterval);
+        audio._fadeInterval = null;
+    }
+
+    const steps = 30; // smoother fade
+    const stepTime = duration / steps;
+    const startVolume = audio.volume;
+    const volumeStep = startVolume / steps;
+
+    audio._fadeInterval = setInterval(() => {
+        if (audio.paused || audio.ended) {
+            clearInterval(audio._fadeInterval);
+            audio._fadeInterval = null;
+            return;
+        }
+
+        const newVolume = audio.volume - volumeStep;
+        if (newVolume > 0.001) {
+            audio.volume = newVolume;
+        } else {
+            audio.volume = 0;
+            audio.pause();
+            clearInterval(audio._fadeInterval);
+            audio._fadeInterval = null;
+        }
+    }, stepTime);
+}
+        
+        
 
         // Helper function to check if two patterns are the same up to rotation
         function arePatternsEquivalent(pattern1, pattern2) {
@@ -603,15 +589,6 @@
                 if (!deck.some(existingPattern => arePatternsEquivalent(pattern, existingPattern))) {
                     deck.push(pattern);
                 }
-            }
-        }
-        
-        function toggleInstructions() {
-            const modal = document.getElementById('instructionsModal');
-            if (modal.style.display === 'block') {
-                modal.style.display = 'none';
-            } else {
-                modal.style.display = 'block';
             }
         }
         
@@ -895,8 +872,12 @@
                 } else {
                     // Play regular correct sound for non-bonus correct answers
                     const correctSound = document.getElementById('correctSound');
-                    correctSound.volume = 0.08;
+                    correctSound.currentTime = 0;
+                    correctSound.volume = 0.10;
                     correctSound.play();
+                    setTimeout(() => {
+                fadeOut(correctSound, 1000); // Fade over 1 second
+            }, 500);
                 }
                 
                 // Draw new cards after a short delay
@@ -908,8 +889,10 @@
                 score = Math.max(0, score - 2); // Don't go below 0
                 streak = 0;
                 const incorrectSound = document.getElementById('incorrectSound');
-                incorrectSound.volume = 0.08;
+                incorrectSound.currentTime = 0;
+                incorrectSound.volume = 0.55;
                 incorrectSound.play();
+
                 
                 // Show explanation
                 const sharedPatternSize = analysis.matches.length;
@@ -1054,6 +1037,7 @@
 	    }
         
         function resetGame() {
+            document.getElementById('next-button').style.display = 'none';
             document.getElementById('gameOverModal').style.display = 'none';
             startGame();
         }
@@ -1062,4 +1046,4 @@
         generateDeck();
     </script>
 </body>
-</html>1988154
+</html>

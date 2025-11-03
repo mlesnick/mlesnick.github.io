@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nails Instructions</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: black;
+      color: white;
+      margin: 0;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1, h2, h3 {
+      color: white;
+      text-align: center;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      margin: 20px 0;
+    }
+    .content {
+      max-width: 800px;
+    }
+    .back-button {
+      margin-top: 30px;
+      background-color: #2196F3;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .back-button:hover {
+      background-color: #1976D2;
+    }
+  </style>
+</head>
+<body>
+  <h1>Nails</h1>
+  <h2>Instructions</h2>
+
+  <div class="content">
+    <p><strong>Nails</strong> is a simple pattern-matching card game in the spirit of SET, with a dynamic similar to war. This HTML version is for one player.</p>
+
+    <p>Each card has five dots arranged in a circle. Each dot is red, blue, or yellow.</p>
+    <p>A pair is a <strong>hit</strong> if there is a pattern of three dots appearing on both cards AND no pattern of four dots appearing on both cards. Otherwise, the pair is a <strong>miss</strong>. To count, patterns must have the same clockwise/counterclockwise orientation.</p>
+
+    <img src="./nails_examples_black.png" alt="Examples of hits and misses">
+
+    <h3>Game Play</h3>
+    <ol>
+      <li>You have 100 seconds to score as many points as possible.</li>
+      <li>Each correct answer: +1 point.</li>
+      <li>Each incorrect answer: −2 points.</li>
+      <li>Five correct in a row: +15-second bonus.</li>
+      <li>Keyboard shortcuts: H (Hit), M (Miss), N (Next).</li>
+    </ol>
+
+    <h3>Notes</h3>
+    <p>The two cards shown are never the same, and cards with all dots the same color are excluded. The probability that a random pair is a hit is approximately 50.5%.</p>
+
+    <h3>About</h3>
+    <p>The card game Nails was designed in 2010 by Michael Lesnick and developed by Michael and Thomas Lesnick. This HTML version was created in 2025 by Michael Lesnick with invaluable help from Aaron Soloway and Claude.</p>
+
+    <h3>Contact</h3>
+    <p>Feedback about the game is welcome at <strong>lesnick@gmail.com</strong>.</p>
+  </div>
+
+  <button class="back-button" onclick="window.location.href='nails.html'">Back to Game</button>
+</body>
+</html>

@@ -22,7 +22,13 @@
     img {
       max-width: 100%;
       height: auto;
-      margin: 20px 0;
+      margin: 20px auto;
+      display: block;
+    }
+    @media (min-width: 768px) {
+      img {
+        max-width: 500px;
+      }
     }
     .content {
       max-width: 800px;
@@ -49,15 +55,15 @@
     <p><strong>Nails</strong> is a simple pattern-matching card game in the spirit of SET, with a dynamic similar to war. This HTML version is for one player.</p>
 
     <p>Each card has five dots arranged in a circle. Each dot is red, blue, or yellow.</p>
-    <p>A pair of cards is a <strong>hit</strong> if there is a pattern of three dots appearing on both cards AND no pattern of four dots appearing on both cards. Otherwise, the pair is a <strong>miss</strong>. To count, patterns must have the same clockwise/counterclockwise orientation.</p>
+    <p>A pair of cards is a <strong>hit</strong> if there is a pattern of three dots appearing on both cards AND no pattern of four dots appearing on both cards. Otherwise, the pair is a <strong>miss</strong>. To count, patterns must have the same clockwise orientation.</p>
 
     <img src="./nails_examples_black.png" alt="Examples of hits and misses">
 
     <h3>Gameplay</h3>
     <ol>
       <li>You have 100 seconds to score as many points as possible.</li>
-      <li>Each correct answer: +1 point.</li>
-      <li>Each incorrect answer: −2 points.</li>
+      <li>Correct answer: +1 point.</li>
+      <li>Incorrect answer: −2 points.</li>
       <li>Five correct in a row: +15-second bonus.</li>
       <li>Keyboard shortcuts: H (Hit), M (Miss), N (Next).</li>
     </ol>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zest Instructions</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: black;
+      color: white;
+      margin: 0;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1, h2, h3 {
+      color: white;
+      text-align: center;
+      font-family: "Comic Sans MS", "Comic Sans", cursive;
+    }
+    .content {
+      max-width: 800px;
+    }
+    .back-button {
+      display: block;
+      margin: 30px auto 0;
+      background-color: #2196F3;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      font-family: "Comic Sans MS", "Comic Sans", cursive;
+    }
+    .back-button:hover {
+      background-color: #1976D2;
+    }
+    .examples-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px 50px;
+      margin: 30px 0;
+    }
+    .example {
+      text-align: center;
+    }
+    .example-label {
+      font-size: 1.0em;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    .example-sublabel {
+      font-size: 0.9em;
+      color: #aaa;
+      margin-top: 5px;
+    }
+    .card-pair {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    @media (max-width: 600px) {
+      .examples-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    /* Card styles from zest-shared.css */
+    .card {
+      width: 150px;
+      height: 150px;
+      background-color: black;
+      border: 2px solid rgba(255, 255, 255,.8);
+      border-radius: 50%;
+      position: relative;
+      display: inline-block;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .dot-star {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      z-index: 1;
+    }
+    .dot-star svg {
+      width: 100%;
+      height: 100%;
+    }
+    .highlight-group {
+      position: absolute;
+      pointer-events: none;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .highlight-bubble {
+      position: absolute;
+      background-color: rgba(0, 255, 255, 0.15);
+      border: 2px solid rgba(0, 255, 255, 0.4);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      transform: translate(-22px, -22px);
+    }
+  </style>
+    <script src="zest-shared.js"></script>
+</head>
+<body>
+  <h2>Zest Instructions</h2>
+
+  <div class="content">
+    <p><strong>Zest</strong> is a simple pattern-matching card game in the spirit of SET, with a dynamic similar to war. This HTML version is for one player.</p>
+
+    <p>Each card has five fruits arranged in a circle. Each fruit is a strawberry, lemon, or bunch of blueberries.</p>
+    <p>A pair of cards is <strong>sweet</strong> if there is a pattern of three fruits appearing on both cards AND no pattern of four fruits appearing on both cards. Otherwise, the pair is <strong>tart</strong>. To count, patterns must have the same clockwise orientation.</p>
+
+    <div class="examples-grid" id="examples-grid">
+      <!-- Examples will be populated by JavaScript -->
+    </div>
+
+    <h3>Gameplay</h3>
+    Basic mode:
+    <ol>
+      <li>You have 100 seconds to score as many points as possible.</li>
+      <li>Correct answer: +1 point.</li>
+      <li>Incorrect answer: −2 points.</li>
+      <li>Five correct in a row: +15-second bonus.</li>
+      <li>Keyboard shortcuts: S (Sweet), T (Tart), N (Next).</li>
+    </ol>
+    
+    Challenge mode:
+        <ol>
+      <li>For the first five points, gameplay is the same as in basic mode.</li>
+      <li>Every five points, a new variant of the game is introduced: At 5 points, the cards rotate.  At 10 points, dots flicker.  At 15 points, an "inverse" variant is introduced,  where the player identifies a missing fruit.  </li>
+      <li>After 20 points, the round type is chosen randomly from the four variants already introduced.</li>
+      <li> At 10 points, the player receives a 60 second time bonus.</li>
+    </ol>
+
+    <h3>Notes</h3>
+    <p>The two cards drawn are never the same, and cards with all fruits the same type are excluded. Pairs of cards are drawn at random, with each pair equally likely. The probability that a pair is a hit is approximately 50.5%.  Thus, the chance of a pair being a hit or a miss is almost the same, and this is critical to the game dynamic.</p>
+
+    <h3>About</h3>
+    <p>The card game Zest was designed in 2010 by Michael Lesnick and developed by Michael and Thomas Lesnick. This HTML version was created in 2025 by Michael Lesnick with invaluable help from Aaron Soloway and Claude.</p>
+
+    <h3>Contact</h3>
+    <p>Feedback about the game is welcome at <strong>lesnick@gmail.com</strong>.</p>
+    
+    <button class="back-button" onclick="window.location.href='zest.html'">Back to Game</button>
+  </div>
+
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+
+
+
+    // Helper to convert color codes to full names
+    function parsePattern(str) {
+      const map = { 'r': 'red', 'y': 'yellow', 'b': 'blue' };
+      return str.split('').map(c => map[c]);
+    }
+
+    // Example data: [card1Pattern, card2Pattern, label, sublabel, highlights1, highlights2]
+    const examples = [
+      // Row 1: 4 SWEET
+      [parsePattern('rryyr'), parsePattern('rrbbr'), 'SWEET', null, [0,1,4], [0,1,4]],
+      [parsePattern('yrbby'), parsePattern('yybbr'), 'SWEET', null, [0,2,3], [0,2,3]],
+      [parsePattern('bbryr'), parsePattern('rybbr'), 'SWEET', null, [0,1,2], [2,3,4]],
+      [parsePattern('byybr'), parsePattern('rbyby'), 'SWEET', null, [0,1,3], [1,3,4]],
+      // Row 2: 4 TART
+      [parsePattern('yyryy'), parsePattern('bbbry'), 'TART', "no pattern of three dots<br>appears on both cards", null, null],
+      [parsePattern('yrybr'), parsePattern('yrbyb'), 'TART', "no pattern of three dots<br>appears on both cards", null, null],
+      [parsePattern('byyyy'), parsePattern('yyryy'), 'TART', "a pattern of four dots<br>appears on both cards", [1,2,3,4], [0,1,3,4]],
+      [parsePattern('bybrb'), parsePattern('brbry'), 'TART', "a pattern of four dots<br>appears on both cards", [1,2,3,4], [0,1,2,4]]
+    ];
+
+    const grid = document.getElementById('examples-grid');
+    
+    examples.forEach(function(ex, idx) {
+      const card1Pattern = ex[0];
+      const card2Pattern = ex[1];
+      const label = ex[2];
+      const sublabel = ex[3];
+      const highlights1 = ex[4];
+      const highlights2 = ex[5];
+      
+      const exampleDiv = document.createElement('div');
+      exampleDiv.className = 'example';
+      
+      const cardPair = document.createElement('div');
+      cardPair.className = 'card-pair';
+      
+      const card1 = document.createElement('div');
+      card1.className = 'card';
+      displayCardStatic(card1, card1Pattern);
+      if (highlights1) addHighlightBubbles(card1, highlights1);
+      
+      const card2 = document.createElement('div');
+      card2.className = 'card';
+      displayCardStatic(card2, card2Pattern);
+      if (highlights2) addHighlightBubbles(card2, highlights2);
+      
+      cardPair.appendChild(card1);
+      cardPair.appendChild(card2);
+      exampleDiv.appendChild(cardPair);
+      
+      const labelDiv = document.createElement('div');
+      labelDiv.className = 'example-label';
+      labelDiv.textContent = label;
+      exampleDiv.appendChild(labelDiv);
+      
+      if (sublabel) {
+        const sublabelDiv = document.createElement('div')
+        sublabelDiv.className = 'example-sublabel';
+        sublabelDiv.innerHTML = sublabel;
+        exampleDiv.appendChild(sublabelDiv);
+      }
+
+      grid.appendChild(exampleDiv);
+    });
+  </script>
+</body>
+</html>

@@ -1236,7 +1236,7 @@ function fadeOut(audio, duration) {
             // Show explanation
             const sharedPatternSize = analysis.matches.length;
             document.getElementById('explorer-result').innerHTML = 
-                `These cards ${correctAnswer === 'hit' ? 'SWEET' : 'TART'}.<br>` +
+                `This pair is ${correctAnswer === 'hit' ? 'SWEET' : 'TART'}.<br>` +
                 `Max size of shared pattern: ${sharedPatternSize}`;
             document.getElementById('explorer-result').style.color = correctAnswer === 'hit' ? "#4CAF50" : "#f44336";
             

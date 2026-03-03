@@ -138,16 +138,33 @@
       <li> At 10 points, the player receives a 60 second time bonus.</li>
     </ol>
 
-    <h3>Notes</h3>
-    <p>The two cards drawn are never the same, and cards with all fruits the same type are excluded. Pairs of cards are drawn at random, with each pair equally likely. The probability that a pair is a hit is approximately 50.5%.  Thus, the chance of a pair being a hit or a miss is almost the same, and this is critical to the game dynamic.</p>
+    <h3>The Probability of Sweet and Tart Pairs</h3>
+    <p>The two cards drawn are never the same, and cards with all fruits the same type are excluded. Pairs of cards are drawn at random, with each pair equally likely.  The probability that a pair is sweet is approximately 50.5%.  Thus, the chance of a pair being a hit or a miss is almost the same; this is critical to the game dynamic.</p>
+
+   <h3>The Mathematics behind Zest</h3>
+    <p>We define the <i>distance</i> between a pair of cards to be the minimum number of fruits that must be changed on one card to make it the same as the other card, up to rotation.  Then a pair is sweet exactly when the distance between the cards is <strong>two</strong>.  
+    <br><br>    
+    This distance is an example of a <i>metric</i>, a formal mathematical notion of distance satisfying certain axioms.  The idea for the game Zest arose from the question of whether a SET-like game could be designed based on a metric.  The best known example of a metric is the usual straight-line distance between pairs of points in space.  Beyond this, many other metrics play major roles in mathematics and its applications.  Some famous and widely used metrics are: 
+ <ol>
+   <li>the <i>taxi-cab metric</i>, used in genetics and image processing</li>
+   <li>the <i>Wasserstein distance</i>, used in machine learning and image processing</li>
+   <li>the <i>root mean squared distance</i>, used to analyze the shape of proteins and other biomolecules.</li>
+   <li>the <i>Levenshtein distance</i> (or <i>edit distance</i>) used in genetics and for spell-checking.</li>
+</ol> 
+
+While no mathematical understanding of metrics is needed to play Zest, the game provides informal exposure to the idea of a metric, and can be an accessible starting point for learning about metrics.
+
+<!--
+Of these, the Levenshtein distance is the closest to the metric underlying Zest:  The Levenshtein distance between two words is the minimum number of changes needed to transform one word into another word,  where the allowed changes are letter replacement, insertion, and deletion.  For example, the Levenshtein distance between  <strong>sing</strong>  and <strong>string</strong> is 2, because one can obtain <strong>string</strong> from <strong>sing</strong> by inserting the letter  <strong>t</strong>  then inserting the letter <strong>r</strong>:  <strong>sing</strong> &#8594;  <strong>sting</strong> &#8594; <strong>string</strong>.  It is not too difficult to imagine that this distance could be used for spell-checking--what word has the smallest Levenshtein distance to  <strong>Pizwza</strong>?  It is also useful in genetics for comparing genetic sequences, which are words made from the four-letter alphabet <strong> A,C,T,G</strong>.  
+-->
 
     <h3>About</h3>
-    <p>The card game Zest was designed in 2010 by Michael Lesnick and developed by Michael and Thomas Lesnick. This HTML version was created in 2025 by Michael Lesnick with invaluable help from Aaron Soloway and Claude.</p>
+    <p>The card game Zest was designed in 2010 by Michael Lesnick and developed by Michael and Thomas Lesnick. This HTML version was created in 2025 by Michael Lesnick with invaluable help from Aaron Soloway, Claude, and ChatGPT.</p>
 
     <h3>Contact</h3>
     <p>Feedback about the game is welcome at <strong>lesnick@gmail.com</strong>.</p>
     
-    <button class="back-button" onclick="window.location.href='zest.html'">Back to Game</button>
+     <button class="back-button" onclick="window.location.href='zest.html'" style="display: block; margin: 30px auto 0;">Back to Game</button>
   </div>
 
   <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>

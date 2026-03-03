@@ -569,8 +569,10 @@
             <div class="score-line">
                 <span class="final-score-label">score:</span><span id="final-score" class="final-score">0</span>
             </div>
-            <button class="play-again" onclick="resetGame()">Play Again</button>
-            <button class="play-again" onclick="returnToMainMenu()" style="margin-top: 10px; background-color: #666;">Main Menu</button>
+            <div style="display: flex; gap: 20px; justify-content: center; margin-top: 20px;">
+                <button class="play-again" onclick="resetGame()" style="margin-top: 0;">Play Again</button>
+                <button class="play-again" onclick="returnToMainMenu()" style="margin-top: 0; background-color: #666;">Main Menu</button>
+            </div>
         </div>
     </div>
     
@@ -1145,7 +1147,8 @@ function fadeOut(audio, duration) {
             document.querySelector('.miss-button').disabled = false;
             
             // Start flicker interval if in flicker mode (dot is already hidden during displayCard)
-            if (flickerMode && !flickerInterval) {
+            if (flickerMode) {
+                if (flickerInterval) clearInterval(flickerInterval);
                 flickerInterval = setInterval(flickerDots, 2000);
             }
         }
@@ -1171,8 +1174,8 @@ function fadeOut(audio, duration) {
                 if (!shouldHide) {
                     dot.appendChild(createFruitElement(pattern[i], shapeRotation));
                 }
-                dot.style.left = `${x - 15}px`;
-                dot.style.top = `${y - 15}px`;
+                dot.style.left = `${x - 20}px`;
+                dot.style.top = `${y - 20}px`;
                 cardElement.appendChild(dot);
             }
         }
@@ -1193,8 +1196,8 @@ function fadeOut(audio, duration) {
                 dot.className = 'dot-star clickable';
                 const shapeRotation = angle + 90;
                 dot.appendChild(createFruitElement(pattern[i], shapeRotation));
-                dot.style.left = `${x - 15}px`;
-                dot.style.top = `${y - 15}px`;
+                dot.style.left = `${x - 20}px`;
+                dot.style.top = `${y - 20}px`;
                 dot.style.cursor = 'pointer';
                 
                 // Store index for click handler
@@ -1532,12 +1535,7 @@ function fadeOut(audio, duration) {
                 applyZestyPhase(getRandomZestyPhase());
             }
             
-            // Restart flicker if in flicker mode
-            if (flickerMode && !flickerInterval) {
-                flickerInterval = setInterval(flickerDots, 2000);
-            }
-            
-            // Draw new cards
+            // Draw new cards (drawCards will restart flicker interval if needed)
             drawCards();
         }
         
@@ -1925,8 +1923,8 @@ function fadeOut(audio, duration) {
                 dot.className = 'dot-star' + (isMystery ? ' mystery-dot' : '');
                 const shapeRotation = angle + 90;
                 dot.appendChild(createFruitElement(color, shapeRotation));
-                dot.style.left = `${xPos - 15}px`;
-                dot.style.top = `${yPos - 15}px`;
+                dot.style.left = `${xPos - 20}px`;
+                dot.style.top = `${yPos - 20}px`;
                 
                 if (isMystery) {
                     dot.style.cursor = 'pointer';

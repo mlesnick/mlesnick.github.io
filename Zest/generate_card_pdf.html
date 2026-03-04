@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Zest PDF Generator</title>
+    <style>
+        body { font-family: sans-serif; background: #222; color: #eee; padding: 20px; max-width: 700px; }
+        h1 { color: #4CAF50; }
+        p { line-height: 1.5; }
+        button { padding: 10px 24px; font-size: 1.1em; background: #4CAF50; color: white;
+                 border: none; border-radius: 5px; cursor: pointer; margin: 8px 4px 8px 0; }
+        button:hover { background: #45a049; }
+        button:disabled { background: #555; cursor: not-allowed; }
+        #status { white-space: pre-wrap; font-family: monospace; font-size: 0.9em;
+                  background: #111; padding: 12px; border-radius: 5px;
+                  max-height: 300px; overflow-y: auto; margin-top: 10px; }
+        .warn { color: #FF9800; }
+        .ok   { color: #4CAF50; }
+        progress { width: 100%; height: 20px; margin: 8px 0; }
+    </style>
+</head>
+<body>
+    <h1>Zest Card PDF Generator</h1>
+    <p>
+        Generates a 16-page, double-sided PDF: odd pages = card fronts, even pages = matching card backs.<br>
+        6 cards per sheet (2 columns × 3 rows), 8 sheets = 48 cards.<br>
+        <strong>Serve from the game's home folder via <code>python3 -m http.server</code></strong>
+        and open <code>http://localhost:8000/generate_card_pdf.html</code>.
+    </p>
+    <button id="go-btn" onclick="generate()">Generate PDF</button>
+    <progress id="prog" value="0" max="100" style="display:none"></progress>
+    <div id="status">Ready.</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+
+// ── Page / layout constants (from original Cards.pdf) ─────────────
+const PAGE_W    = 612;
+const PAGE_H    = 792;
+const CARD_D_PT = 248.082;   // card diameter in points
+const CARD_CENTERS = [
+    { x: 147.647, y: 142.5 },
+    { x: 464.373, y: 142.5 },
+    { x: 147.647, y: 395.0 },
+    { x: 464.373, y: 395.0 },
+    { x: 147.647, y: 647.6 },
+    { x: 464.373, y: 647.6 },
+];
+
+// ── Card front drawing geometry (matches generate_card_svgs.html) ──
+// The card SVG coordinate space is 800×800, circle radius 380, center 400,400.
+// Fruit ring radius = round(50 * 760/150) = 253
+// DOT_HALF = round(20 * 760/150) = 101
+const SCALE   = 760 / 150;
+const SVG_BOX = 800;
+const CCX = 400, CCY = 400;   // card center in SVG coords
+const RING_R  = Math.round(50  * SCALE);  // 253
+const DOT_HALF = Math.round(20 * SCALE);  // 101
+
+const FRUIT_CONFIG = {
+    red:    { file: './images/Strawberry.png',  w: Math.round(44 * SCALE), h: Math.round(44 * SCALE), offsetAngle: -15 },
+    yellow: { file: './images/Lemon.png',       w: Math.round(40 * SCALE), h: Math.round(40 * SCALE), offsetAngle:   0 },
+    blue:   { file: './images/Blueberries.png', w: Math.round(44 * SCALE), h: Math.round(44 * SCALE), offsetAngle:   0 },
+};
+
+// ── Deck generation ────────────────────────────────────────────────
+const COLORS = ['red', 'blue', 'yellow'];
+
+function arePatternsEquivalent(p1, p2) {
+    for (let r = 0; r < 5; r++)
+        if (p1.every((c, i) => c === p2[(i + r) % 5])) return true;
+    return false;
+}
+
+function generateDeck() {
+    const deck = [];
+    for (let i = 0; i < 3**5; i++) {
+        let pattern = [], temp = i;
+        for (let j = 0; j < 5; j++) { pattern.push(COLORS[temp % 3]); temp = Math.floor(temp / 3); }
+        if (pattern.every(c => c === pattern[0])) continue;
+        if (!deck.some(ep => arePatternsEquivalent(pattern, ep))) deck.push(pattern);
+    }
+    return deck;
+}
+
+// ── Image loader ───────────────────────────────────────────────────
+function loadImage(src) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload  = () => resolve(img);
+        img.onerror = () => reject(new Error(`Failed to load: ${src}`));
+        img.src = src;
+    });
+}
+
+// ── Draw one card front onto a canvas context ──────────────────────
+// ctx: CanvasRenderingContext2D, already scaled so that SVG_BOX px = card size on canvas
+// fruitImgs: { red: Image, yellow: Image, blue: Image }
+function drawCardFront(ctx, pattern, fruitImgs) {
+    const size = SVG_BOX;
+
+    // Black background circle
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(CCX, CCY, SVG_BOX / 2, 0, 2 * Math.PI);
+    ctx.fillStyle = 'black';
+    ctx.fill();
+    ctx.clip();  // clip fruit images to circle
+
+    // Draw each fruit
+    for (let i = 0; i < 5; i++) {
+        const angle  = (i * 72 - 90) * Math.PI / 180;
+        const fx = CCX + RING_R * Math.cos(angle);
+        const fy = CCY + RING_R * Math.sin(angle);
+        const cfg = FRUIT_CONFIG[pattern[i]];
+        const img = fruitImgs[pattern[i]];
+        if (!img) continue;
+
+        const shapeRotation = (i * 72 - 90 + 90 + cfg.offsetAngle) * Math.PI / 180;
+        const imgLeft = fx - DOT_HALF + (DOT_HALF * 2 - cfg.w) / 2;
+        const imgTop  = fy - DOT_HALF + (DOT_HALF * 2 - cfg.h) / 2;
+        const pivotX  = imgLeft + cfg.w / 2;
+        const pivotY  = imgTop  + cfg.h / 2;
+
+        ctx.save();
+        ctx.translate(pivotX, pivotY);
+        ctx.rotate(shapeRotation);
+        ctx.drawImage(img, -cfg.w / 2, -cfg.h / 2, cfg.w, cfg.h);
+        ctx.restore();
+    }
+
+    ctx.restore();
+}
+
+// ── Render a card front to a PNG data URL ──────────────────────────
+function cardFrontToPNG(pattern, fruitImgs, renderSize) {
+    const canvas = document.createElement('canvas');
+    canvas.width  = renderSize;
+    canvas.height = renderSize;
+    const ctx = canvas.getContext('2d');
+    const s = renderSize / SVG_BOX;
+    ctx.scale(s, s);
+    drawCardFront(ctx, pattern, fruitImgs);
+    return canvas.toDataURL('image/png');
+}
+
+// ── Status helpers ─────────────────────────────────────────────────
+const statusEl = document.getElementById('status');
+const progEl   = document.getElementById('prog');
+
+function log(msg, cls) {
+    const line = document.createElement('div');
+    if (cls) line.className = cls;
+    line.textContent = msg;
+    statusEl.appendChild(line);
+    statusEl.scrollTop = statusEl.scrollHeight;
+}
+function setProgress(pct) { progEl.value = pct; }
+
+// ── Main ───────────────────────────────────────────────────────────
+async function generate() {
+    const btn = document.getElementById('go-btn');
+    btn.disabled = true;
+    statusEl.innerHTML = '';
+    progEl.style.display = 'block';
+    setProgress(0);
+
+    try {
+        // Load the three fruit images once
+        log('Loading fruit images...');
+        const fruitImgs = {};
+        for (const [color, cfg] of Object.entries(FRUIT_CONFIG)) {
+            try {
+                fruitImgs[color] = await loadImage(cfg.file);
+                log(`  ✓ ${cfg.file}`, 'ok');
+            } catch (e) {
+                log(`  ⚠ ${e.message}`, 'warn');
+                fruitImgs[color] = null;
+            }
+        }
+        setProgress(10);
+
+        // Load card back
+        log('Loading card back...');
+        let backPNG = null;
+        try {
+            const backImg = await loadImage('./images/card_back_images/zest_card_back.svg');
+            const bc = document.createElement('canvas');
+            bc.width = bc.height = SVG_BOX;
+            bc.getContext('2d').drawImage(backImg, 0, 0, SVG_BOX, SVG_BOX);
+            backPNG = bc.toDataURL('image/png');
+            log('  ✓ Card back loaded', 'ok');
+        } catch (e) {
+            log(`  ⚠ Card back: ${e.message}`, 'warn');
+        }
+        setProgress(20);
+
+        // Generate deck and render all card fronts
+        const deck = generateDeck();
+        log(`Rendering ${deck.length} card fronts...`);
+        const frontPNGs = [];
+        const RENDER_SIZE = SVG_BOX; // render at native SVG resolution
+        for (let i = 0; i < deck.length; i++) {
+            frontPNGs.push(cardFrontToPNG(deck[i], fruitImgs, RENDER_SIZE));
+            if (i % 8 === 0) setProgress(20 + Math.round((i / deck.length) * 35));
+        }
+        log(`  ✓ All ${deck.length} fronts rendered`, 'ok');
+        setProgress(55);
+
+        // Build PDF
+        log('Building PDF...');
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'pt', format: [PAGE_W, PAGE_H], orientation: 'portrait' });
+
+        const half_pt = CARD_D_PT / 2;
+
+        for (let sheet = 0; sheet < 8; sheet++) {
+            const cardOffset = sheet * 6;
+            if (sheet > 0) doc.addPage([PAGE_W, PAGE_H]);
+
+            // Odd page: fronts
+            for (let slot = 0; slot < 6; slot++) {
+                const c = CARD_CENTERS[slot];
+                const png = frontPNGs[cardOffset + slot];
+                doc.addImage(png, 'PNG', c.x - half_pt, c.y - half_pt, CARD_D_PT, CARD_D_PT);
+            }
+            log(`  Sheet ${sheet+1}: fronts → page ${sheet*2+1}`);
+
+            // Even page: backs (mirrored left-right for duplex "flip on long edge")
+            doc.addPage([PAGE_W, PAGE_H]);
+            for (let slot = 0; slot < 6; slot++) {
+                const c = CARD_CENTERS[slot];
+                const mx = PAGE_W - c.x;  // mirror x
+                if (backPNG) {
+                    doc.addImage(backPNG, 'PNG', mx - half_pt, c.y - half_pt, CARD_D_PT, CARD_D_PT);
+                }
+            }
+            log(`  Sheet ${sheet+1}: backs  → page ${sheet*2+2}`);
+
+            setProgress(55 + Math.round(((sheet + 1) / 8) * 42));
+        }
+
+        log('Saving...');
+        doc.save('zest_cards.pdf');
+        setProgress(100);
+        log('Done! zest_cards.pdf downloaded.', 'ok');
+
+    } catch (err) {
+        log(`Error: ${err.message}`, 'warn');
+        console.error(err);
+    }
+
+    btn.disabled = false;
+}
+    </script>
+</body>
+</html>

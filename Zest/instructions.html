@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zest Instructions</title>
+  <title>Instructions</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -133,7 +133,7 @@
     
     Challenge mode:
         <ol>
-      <li>Every five points, a new variant of the game mechanic is introduced: For the first 5 points, gameplay is exactly as in basic mode.  At 5 points, the cards rotate.  At 10 points, dots flicker.  At 15 points, an "inverse" variant is introduced,  where the player identifies a missing fruit.  </li>
+      <li>Every five points, a new variant of the game mechanic is introduced: For the first 5 points, gameplay is exactly as in basic mode.  At 5 points, the cards rotate.  At 10 points, fruits flicker.  At 15 points, an "inverse" variant is introduced,  where the player identifies a missing fruit.  </li>
       <li>After 20 points, the round type is chosen randomly from these four variants.</li>
       <li> At 10 points, the player receives a 60 second time bonus.</li>
     </ol>
@@ -144,15 +144,14 @@
    <h3>The Mathematics behind Zest</h3>
     <p>We define the <i>distance</i> between a pair of cards to be the minimum number of fruits that must be changed on one card to make it the same as the other card, up to rotation.  Then a pair is sweet exactly when the distance between the cards is <strong>two</strong>.  
     <br><br>    
-    This distance is an example of a <i>metric</i>, a formal mathematical notion of distance satisfying certain axioms.  The idea for the game Zest arose from the question of whether a SET-like game could be designed based on a metric.  The best known example of a metric is the usual straight-line distance between pairs of points in space.  Beyond this, many other metrics play major roles in mathematics and its applications.  Some famous and widely used metrics are: 
+    This distance is an example of a <i>metric</i>, an abstract mathematical notion of distance.  The most well-known metric is the usual straight-line distance between pairs of points in space.  Besides this, many other metrics play major roles in mathematics and its applications.  Some famous and widely used metrics are: 
  <ol>
    <li>the <i>taxi-cab metric</i>, used in genetics and image processing</li>
    <li>the <i>Wasserstein distance</i>, used in machine learning and image processing</li>
    <li>the <i>root mean squared distance</i>, used to analyze the shape of proteins and other biomolecules.</li>
    <li>the <i>Levenshtein distance</i> (or <i>edit distance</i>) used in genetics and for spell-checking.</li>
 </ol> 
-
-While no mathematical understanding of metrics is needed to play Zest, the game provides informal exposure to the idea of a metric, and can be an accessible starting point for learning about metrics.
+While no mathematical understanding of metrics is needed to play Zest, the game provides informal exposure to the idea of a metric, and can be an accessible starting point for learning more about them.  
 
 <!--
 Of these, the Levenshtein distance is the closest to the metric underlying Zest:  The Levenshtein distance between two words is the minimum number of changes needed to transform one word into another word,  where the allowed changes are letter replacement, insertion, and deletion.  For example, the Levenshtein distance between  <strong>sing</strong>  and <strong>string</strong> is 2, because one can obtain <strong>string</strong> from <strong>sing</strong> by inserting the letter  <strong>t</strong>  then inserting the letter <strong>r</strong>:  <strong>sing</strong> &#8594;  <strong>sting</strong> &#8594; <strong>string</strong>.  It is not too difficult to imagine that this distance could be used for spell-checking--what word has the smallest Levenshtein distance to  <strong>Pizwza</strong>?  It is also useful in genetics for comparing genetic sequences, which are words made from the four-letter alphabet <strong> A,C,T,G</strong>.  
@@ -185,10 +184,10 @@ Of these, the Levenshtein distance is the closest to the metric underlying Zest:
       [parsePattern('bbryr'), parsePattern('rybbr'), 'SWEET', null, [0,1,2], [2,3,4]],
       [parsePattern('byybr'), parsePattern('rbyby'), 'SWEET', null, [0,1,3], [1,3,4]],
       // Row 2: 4 TART
-      [parsePattern('yyryy'), parsePattern('bbbry'), 'TART', "no pattern of three dots<br>appears on both cards", null, null],
-      [parsePattern('yrybr'), parsePattern('yrbyb'), 'TART', "no pattern of three dots<br>appears on both cards", null, null],
-      [parsePattern('byyyy'), parsePattern('yyryy'), 'TART', "a pattern of four dots<br>appears on both cards", [1,2,3,4], [0,1,3,4]],
-      [parsePattern('bybrb'), parsePattern('brbry'), 'TART', "a pattern of four dots<br>appears on both cards", [1,2,3,4], [0,1,2,4]]
+      [parsePattern('yyryy'), parsePattern('bbbry'), 'TART', "no pattern of three fruits<br>appears on both cards", null, null],
+      [parsePattern('yrybr'), parsePattern('yrbyb'), 'TART', "no pattern of three fruits<br>appears on both cards", null, null],
+      [parsePattern('byyyy'), parsePattern('yyryy'), 'TART', "a pattern of four fruits<br>appears on both cards", [1,2,3,4], [0,1,3,4]],
+      [parsePattern('bybrb'), parsePattern('brbry'), 'TART', "a pattern of four fruits<br>appears on both cards", [1,2,3,4], [0,1,2,4]]
     ];
 
     const grid = document.getElementById('examples-grid');

@@ -15,10 +15,10 @@ function createFruitElement(color, rotationAngle) {
 
 function createStrawberry(rotationAngle) {
     const img = document.createElement('img');
-    img.src = 'images/Strawberry_No_Background.png';
+    img.src = 'images/Strawberry.png';
     img.width = 44;
     img.height = 44;
-    img.style.transform = `rotate(${rotationAngle - 15}deg)`;
+    img.style.transform = `rotate(${rotationAngle - 13}deg)`;
     img.style.display = 'block';
     img.style.margin = '-2px';
     return img;
@@ -27,7 +27,7 @@ function createStrawberry(rotationAngle) {
 
 function createLemon(rotationAngle) {
     const img = document.createElement('img');
-    img.src = 'images/Lemon_No_Background.png';
+    img.src = 'images/Lemon.png';
     img.width = 40;
     img.height = 40;
     img.style.transform = `rotate(${rotationAngle - 0}deg)`;
@@ -38,10 +38,10 @@ function createLemon(rotationAngle) {
 
 function createBlueberry(rotationAngle) {
     const img = document.createElement('img');
-    img.src = 'images/Blueberries_No_Background.png';
+    img.src = 'images/Blueberries.png';
     img.width = 44;
     img.height = 44;
-    img.style.transform = `rotate(${rotationAngle}deg)`;
+    img.style.transform = `rotate(${rotationAngle - 6}deg)`;
     img.style.display = 'block';
     img.style.margin = '-2px';
     return img;

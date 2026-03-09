@@ -141,15 +141,23 @@
     <h3>The Probability of Sweet and Tart Pairs</h3>
     <p>The two cards drawn are never the same, and cards with all fruits the same type are excluded. Pairs of cards are drawn at random, with each pair equally likely.  The probability that a pair is sweet is approximately 50.5%.  Thus, the chance of a pair being a hit or a miss is almost the same; this is critical to the game dynamic.</p>
 
+ <h3>Helpful Hints</h3>
+It can sometimes be tricky to rigorously check that a pair of cards is tart.  Here are some ideas that can help:
+ <ol>
+  <li>If some fruit appears four times on one card and at most once on the other, then the pair is tart; see the first tart example above.  </li>
+  <li>Similarly, if some fruit appears three times on one card and not at all on the other, then the pair is tart.  </li>
+  <li>If a pair of cards has a pattern on three fruits common to both cards, then there is a common pattern of two <strong>neighboring fruits</strong>.  To rigorously check that there is no common pattern of three fruits, a good strategy is to exhaustively identify common patterns of two neighboring fruits, and check that no such pattern extends to a common pattern of three fruits.  For instance, in the second tart example above, the common patterns of neighboring fruits are (in clockwise order) lemon-blueberry and lemon-strawberry, both of which appear once on each card.  Neither pattern extends to a common pattern of three fruits, so the pair of cards is tart.  </li>
+ </ol>
+
    <h3>The Mathematics behind Zest</h3>
-    <p>We define the <i>distance</i> between a pair of cards to be the minimum number of fruits that must be changed on one card to make it the same as the other card, up to rotation.  Then a pair is sweet exactly when the distance between the cards is <strong>two</strong>.  
+    <p>Define the <i>distance</i> between a pair of cards to be the minimum number of fruits that must be changed on one card to make it the same as the other card, up to rotation.  Then a pair is sweet exactly when the distance between the cards is <strong>two</strong>.  
     <br><br>    
     This distance is an example of a <i>metric</i>, an abstract mathematical notion of distance.  The most well-known metric is the usual straight-line distance between pairs of points in space.  Besides this, many other metrics play major roles in mathematics and its applications.  Some famous and widely used metrics are: 
  <ol>
    <li>the <i>taxi-cab metric</i>, used in genetics and image processing</li>
-   <li>the <i>Wasserstein distance</i>, used in machine learning and image processing</li>
-   <li>the <i>root mean squared distance</i>, used to analyze the shape of proteins and other biomolecules.</li>
-   <li>the <i>Levenshtein distance</i> (or <i>edit distance</i>) used in genetics and for spell-checking.</li>
+   <li>the <i>the Earth mover's (or Wasserstein) distance</i>, used in machine learning and image processing</li>
+   <li>the <i>the edit (or Levenshtein) distance</i> used in genetics and for spell-checking.</li>
+   <li>the <i>root mean squared distance</i>, used to compare the shape of proteins and other biomolecules.</li>
 </ol> 
 While no mathematical understanding of metrics is needed to play Zest, the game provides informal exposure to the idea of a metric, and can be an accessible starting point for learning more about them.  
 
